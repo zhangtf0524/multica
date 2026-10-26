@@ -343,15 +343,42 @@ function ActorSubContent({
   const { data: agents = [] } = useQuery(agentListOptions(wsId));
   const { data: squads = [] } = useQuery(squadListOptions(wsId));
   const query = search.trim().toLowerCase();
-  const filteredMembers = members.filter((m) =>
-    m.name.toLowerCase().includes(query) || matchesPinyin(m.name, query),
-  );
-  const filteredAgents = agents.filter((a) =>
-    !a.archived_at && (a.name.toLowerCase().includes(query) || matchesPinyin(a.name, query)),
-  );
-  const filteredSquads = squads.filter((s) =>
-    !s.archived_at && (s.name.toLowerCase().includes(query) || matchesPinyin(s.name, query)),
-  );
+  const filteredMembers = useMemo(() => {
+    const sorted = [...members].sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" }),
+    );
+    if (!query) return sorted;
+    return sorted.filter(
+      (m) =>
+        m.name.toLowerCase().includes(query) || matchesPinyin(m.name, query),
+    );
+  }, [members, query]);
+
+  const filteredAgents = useMemo(() => {
+    const sorted = agents
+      .filter((a) => !a.archived_at)
+      .sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" }),
+      );
+    if (!query) return sorted;
+    return sorted.filter(
+      (a) =>
+        a.name.toLowerCase().includes(query) || matchesPinyin(a.name, query),
+    );
+  }, [agents, query]);
+
+  const filteredSquads = useMemo(() => {
+    const sorted = squads
+      .filter((s) => !s.archived_at)
+      .sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" }),
+      );
+    if (!query) return sorted;
+    return sorted.filter(
+      (s) =>
+        s.name.toLowerCase().includes(query) || matchesPinyin(s.name, query),
+    );
+  }, [squads, query]);
 
   const isSelected = (type: "member" | "agent" | "squad", id: string) =>
     selected.some((f) => f.type === type && f.id === id);
@@ -521,9 +548,16 @@ function ProjectSubContent({
   const wsId = useWorkspaceId();
   const { data: projects = [] } = useQuery(projectListOptions(wsId));
   const query = search.trim().toLowerCase();
-  const filtered = projects.filter((p) =>
-    p.title.toLowerCase().includes(query),
-  );
+  const filtered = useMemo(() => {
+    const sorted = [...projects].sort((a, b) =>
+      a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: "base" }),
+    );
+    if (!query) return sorted;
+    return sorted.filter(
+      (p) =>
+        p.title.toLowerCase().includes(query) || matchesPinyin(p.title, query),
+    );
+  }, [projects, query]);
 
   return (
     <>
@@ -652,7 +686,16 @@ function LabelSubContent({
   const wsId = useWorkspaceId();
   const { data: labels = [] } = useQuery(labelListOptions(wsId));
   const query = search.trim().toLowerCase();
-  const filtered = labels.filter((l) => l.name.toLowerCase().includes(query));
+  const filtered = useMemo(() => {
+    const sorted = [...labels].sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" }),
+    );
+    if (!query) return sorted;
+    return sorted.filter(
+      (l) =>
+        l.name.toLowerCase().includes(query) || matchesPinyin(l.name, query),
+    );
+  }, [labels, query]);
 
   return (
     <>
@@ -754,7 +797,7 @@ function PropertyFilterOptions({
       .sort((a, b) => {
         if (a.user_id === currentUserId) return -1;
         if (b.user_id === currentUserId) return 1;
-        return 0;
+        return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" });
       })
       .map((m) => ({
         id: formatActorRef("member", m.user_id),

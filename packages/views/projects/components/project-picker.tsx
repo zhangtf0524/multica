@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { FolderKanban } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { projectListOptions } from "@multica/core/projects/queries";
@@ -63,9 +63,16 @@ export function ProjectPicker({
   // Client-side filter: substring match plus pinyin so Chinese project names
   // are reachable by latin input (e.g. "sjtmh" → "数据透明化").
   const query = filter.trim().toLowerCase();
-  const filtered = projects.filter(
-    (p) => p.title.toLowerCase().includes(query) || matchesPinyin(p.title, query),
-  );
+  const filtered = useMemo(() => {
+    const sorted = [...projects].sort((a, b) =>
+      a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: "base" }),
+    );
+    if (!query) return sorted;
+    return sorted.filter(
+      (p) =>
+        p.title.toLowerCase().includes(query) || matchesPinyin(p.title, query),
+    );
+  }, [projects, query]);
 
   // Callers that bring their own trigger (create pill, chat pill, autopilot
   // card, table cell) take over the trigger entirely.
