@@ -2802,6 +2802,7 @@ export function IssueDetail({ issueId, onDelete, onDone, defaultSidebarOpen = tr
             <PropRow label={t(($) => $.detail.prop_due_date)}>
               <DueDatePicker
                 dueDate={issue.due_date}
+                issue={issue}
                 onUpdate={handleUpdateField}
                 defaultOpen={autoOpenProp === "due_date"}
               />

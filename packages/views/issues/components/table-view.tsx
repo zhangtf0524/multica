@@ -1275,6 +1275,7 @@ function IssueTableBodyCell({
         <div onClick={stopRowNavigation} onAuxClick={stopRowNavigation}>
           <DueDatePicker
             dueDate={issue.due_date}
+            issue={issue}
             onUpdate={onUpdate}
             open={editorOpen}
             onOpenChange={setEditorOpen}

@@ -1,13 +1,16 @@
 "use client";
 
 import { CalendarDays } from "lucide-react";
-import type { UpdateIssueRequest } from "@multica/core/types";
+import type { Issue, UpdateIssueRequest } from "@multica/core/types";
+import { issueBehavesAsAny } from "@multica/core/issues";
 import { DateOnlyPicker } from "../../../common/date-only-picker";
 import { useT } from "../../../i18n";
 
 export function DueDatePicker({
   dueDate,
   onUpdate,
+  highlightOverdue,
+  issue,
   trigger,
   triggerRender,
   tooltip,
@@ -18,6 +21,8 @@ export function DueDatePicker({
 }: {
   dueDate: string | null;
   onUpdate: (updates: Partial<UpdateIssueRequest>) => void;
+  highlightOverdue?: boolean;
+  issue?: Pick<Issue, "status" | "status_category">;
   trigger?: React.ReactNode;
   triggerRender?: React.ReactElement<Record<string, unknown>>;
   /** Hover tooltip naming the property; hidden while the picker is open. */
@@ -30,6 +35,14 @@ export function DueDatePicker({
   defaultOpen?: boolean;
 }) {
   const { t } = useT("issues");
+  const isClosedOrDone = issue
+    ? issue.status === "done" ||
+      issue.status === "cancelled" ||
+      issueBehavesAsAny(issue, ["done", "closed"])
+    : false;
+  const shouldHighlightOverdue =
+    highlightOverdue !== undefined ? highlightOverdue : !isClosedOrDone;
+
   return (
     <DateOnlyPicker
       value={dueDate}
@@ -37,7 +50,7 @@ export function DueDatePicker({
       icon={<CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />}
       placeholder={t(($) => $.pickers.due_date.trigger_label)}
       emptyLabel={t(($) => $.pickers.due_date.none)}
-      highlightOverdue
+      highlightOverdue={shouldHighlightOverdue}
       trigger={trigger}
       triggerRender={triggerRender}
       tooltip={tooltip}

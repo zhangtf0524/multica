@@ -12,6 +12,7 @@ import { propertyListOptions } from "@multica/core/properties";
 import { CustomPropertyValueDisplay } from "./pickers/custom-property-picker";
 import { descriptionPreview } from "./description-preview";
 import { formatDateOnly, isPastDateOnly } from "@multica/core/issues/date";
+import { issueBehavesAsAny } from "@multica/core/issues";
 import { CalendarClock, CalendarDays } from "lucide-react";
 import { ActorAvatar } from "../../common/actor-avatar";
 import { PropertyIcon } from "../../common/property-icon";
@@ -110,6 +111,11 @@ export const BoardCardContent = memo(function BoardCardContent({
     storeProperties.assignee && cardGrouping !== "assignee" && hasAssignee;
   const showStartDate = storeProperties.startDate && issue.start_date;
   const showDueDate = storeProperties.dueDate && issue.due_date;
+  const isClosedOrDone =
+    issue.status === "done" ||
+    issue.status === "cancelled" ||
+    issueBehavesAsAny(issue, ["done", "closed"]);
+  const isOverdue = !isClosedOrDone && isPastDateOnly(issue.due_date);
   const showProject =
     storeProperties.project && cardGrouping !== "project" && project;
   const showChildProgress = storeProperties.childProgress && childProgress;
@@ -293,12 +299,13 @@ export const BoardCardContent = memo(function BoardCardContent({
                   <PickerWrapper className="flex shrink-0">
                     <DueDatePicker
                       dueDate={issue.due_date}
+                      issue={issue}
                       onUpdate={handleUpdate}
                       tooltip={t(($) => $.detail.prop_due_date)}
                       trigger={
                         <span
                           className={`flex items-center gap-1 text-caption ${
-                            isPastDateOnly(issue.due_date)
+                            isOverdue
                               ? "text-destructive"
                               : "text-muted-foreground"
                           }`}
@@ -312,7 +319,7 @@ export const BoardCardContent = memo(function BoardCardContent({
                 ) : (
                   <span
                     className={`flex shrink-0 items-center gap-1 text-caption ${
-                      isPastDateOnly(issue.due_date)
+                      isOverdue
                         ? "text-destructive"
                         : "text-muted-foreground"
                     }`}

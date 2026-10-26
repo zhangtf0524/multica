@@ -72,6 +72,7 @@ export function IssuePropertyPills({
       )}
       <DueDatePicker
         dueDate={issue.due_date}
+        issue={issue}
         onUpdate={onUpdate}
         triggerRender={<PillButton />}
         align="start"

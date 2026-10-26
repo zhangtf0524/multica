@@ -1,6 +1,6 @@
 "use client";
 
-import { issueStatusCategory } from "@multica/core/issues";
+import { issueBehavesAsAny, issueStatusCategory } from "@multica/core/issues";
 import { useIssueStatuses } from "@multica/core/issue-statuses/hooks";
 import { useStatusLabel } from "./../utils/status-label";
 import { useCallback, type ReactNode } from "react";
@@ -233,7 +233,11 @@ function IssueHoverCardDetails({ issue }: { issue: Issue }) {
   const hasProgress = !!progress && progress.total > 0;
   const prs = pullRequests?.pull_requests ?? [];
   const leadPr = leadPullRequest(prs);
-  const isOverdue = !!issue.due_date && isPastDateOnly(issue.due_date);
+  const isClosedOrDone =
+    issue.status === "done" ||
+    issue.status === "cancelled" ||
+    issueBehavesAsAny(issue, ["done", "closed"]);
+  const isOverdue = !isClosedOrDone && !!issue.due_date && isPastDateOnly(issue.due_date);
 
   return (
     <div className="flex flex-col gap-2">
