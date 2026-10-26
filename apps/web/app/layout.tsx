@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Inter, Geist_Mono, Source_Serif_4 } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@multica/ui/components/ui/sonner";
 import { cn } from "@multica/ui/lib/utils";
@@ -31,37 +30,9 @@ import "./globals.css";
 // "Managed by runtime", dashboard/squad placeholders) plus every markdown <em> and
 // blockquote rendered as browser-synthesized oblique. Keep in sync with desktop's
 // `@fontsource-variable/inter/wght-italic.css` import.
-const inter = Inter({
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  variable: "--font-inter",
-});
-// Mono font has no explicit CJK fallback: CJK chars in code blocks are inherently
-// non-aligned with a mono grid (Chinese is proportional), so listing CJK fonts
-// here would falsely signal alignment guarantees. Browser default fallback handles
-// the rare mixed case correctly.
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  fallback: ["ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],
-});
-// Editorial serif used for onboarding headlines. Italic support for h1 em
-// accents (e.g. "...on one shared board."). Only loaded on routes that
-// render the font; layout-shift-prevention handled by next/font's synthetic
-// fallback metrics, same as Inter.
-const sourceSerif = Source_Serif_4({
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  variable: "--font-serif",
-  fallback: [
-    "ui-serif",
-    "Iowan Old Style",
-    "Apple Garamond",
-    "Baskerville",
-    "Times New Roman",
-    "serif",
-  ],
-});
+const inter = { variable: "" };
+const geistMono = { variable: "" };
+const sourceSerif = { variable: "" };
 
 export const viewport: Viewport = {
   width: "device-width",

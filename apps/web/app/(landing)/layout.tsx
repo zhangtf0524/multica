@@ -1,18 +1,7 @@
-import { Instrument_Serif } from "next/font/google";
 import { LocaleProvider } from "@/features/landing/i18n";
 import { getRequestLocale } from "@/lib/request-locale";
 
-// Instrument Serif is the landing display face and is Latin-only. The full
-// `--font-serif` stack (Instrument Serif + the per-locale CJK serif tail) is
-// composed in static CSS in app/custom.css, not here — same reasoning as
-// `--font-sans` in app/globals.css: the CJK tail must be overridable per
-// `<html lang>`, and a hashed next/font family can only be referenced from CSS
-// through its variable.
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-instrument-serif",
-});
+const instrumentSerif = { variable: "" };
 
 const jsonLd = {
   "@context": "https://schema.org",
